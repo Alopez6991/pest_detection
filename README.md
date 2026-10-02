@@ -81,8 +81,8 @@ python3 example/video_to_frames.py example/example.mp4
 ```
 
 ```
-example.mp4 -> example_frames/example_000.jpg  (277 frames)
-  277 frames, 2.2 MB
+example.mp4 -> example/example_00000.png  (277 frames)
+  277 frames, 26.8 MB
 ```
 
 ### 3. What you get
@@ -92,40 +92,42 @@ The frames land in a folder **next to the video**, named after it:
 ```
 example/
 ├── example.mp4
-├── example_frames/          <- created for you
-│   ├── example_001.jpg
-│   ├── example_002.jpg
+├── example/                 <- created for you
+│   ├── example_00000.png
+│   ├── example_00001.png
 │   ├── ...
-│   └── example_277.jpg
+│   └── example_00276.png
 └── video_to_frames.py
 ```
 
 Both the folder and the frames carry the video's name, so they stay
 identifiable once they are copied somewhere else or mixed with another clip's.
-Zero-padding is sized to the frame count, so the names sort correctly in a file
-browser and in a shell glob.
 
-`example_frames/` is **gitignored**. It is generated, exactly reproducible from
-the video beside it, and two and a half times the size of it — so it is not committed,
-and you regenerate it by running the command above.
+**This is the same layout the Colab notebook produces** — same folder name,
+same filenames, same PNG, same five digits counting from zero — so frames from
+either route are interchangeable and a glob written for one works on the other.
+
+The generated folder is **gitignored**. It is exactly reproducible from the
+video beside it, and far larger: `example.mp4` is 896 KB, its 277 PNG frames
+are 27 MB. Regenerate it by running the command above.
 
 ### 4. Run it on your own video
 
-Put the video anywhere and point the script at it. The `_frames` folder is
+Put the video anywhere and point the script at it. The frame folder is
 created beside the video, not beside the script, so nothing lands in the repo
 unless the video is in the repo:
 
 ```bash
 python3 example/video_to_frames.py ~/recordings/hive_01.mjpeg
-#   -> ~/recordings/hive_01_frames/hive_01_001.jpg ...
+#   -> ~/recordings/hive_01/hive_01_00000.png ...
 ```
 
 To collect several videos' frames in one place instead, use `--outdir`:
 
 ```bash
 python3 example/video_to_frames.py ~/recordings/*.mjpeg --outdir ~/datasets/raw
-#   -> ~/datasets/raw/hive_01_frames/...
-#      ~/datasets/raw/hive_02_frames/...
+#   -> ~/datasets/raw/hive_01/...
+#      ~/datasets/raw/hive_02/...
 ```
 
 ### 5. Options
@@ -133,10 +135,10 @@ python3 example/video_to_frames.py ~/recordings/*.mjpeg --outdir ~/datasets/raw
 | | |
 |---|---|
 | `--every N` | keep 1 frame in every N. A 60 s clip at 16 fps is ~960 frames; `--every 8` makes that 120 |
-| `--format png` | lossless, roughly 10x bigger. Use for anything that will be re-encoded |
+| `--format jpg` | ~10x smaller than the default PNG. 277 frames: 2.2 MB as jpg, 27 MB as png |
 | `--quality Q` | jpg quality, 2 = best (default), 31 = worst |
-| `--digits N` | fix the zero-padding width instead of sizing it to the frame count |
-| `--outdir DIR` | put the `_frames` folders somewhere else |
+| `--digits N` | zero-padding width (default 5, as the notebook) |
+| `--outdir DIR` | put the frame folders somewhere else |
 | `--dry-run` | print what it would write, touch nothing |
 
 ```bash
@@ -144,7 +146,7 @@ python3 example/video_to_frames.py example/example.mp4 --every 10 --dry-run
 ```
 
 ```
-example.mp4 -> example_frames/example_00.jpg  (28 frames, every 10)
+example.mp4 -> example/example_00000.png  (28 frames, every 10)
 ```
 
 Start with `--dry-run` on a long recording: it tells you the frame count and
@@ -194,17 +196,11 @@ Open the **folder icon** in the left sidebar, find the folder it just made,
 then the **⋮** menu beside it → **Download**. Colab zips it first, so a few
 hundred PNGs take a moment.
 
-### It names things differently from the local script
+### It produces the same layout as the local script
 
-Same frames, different filenames — worth knowing if you use both:
-
-| | folder | first frame |
-|---|---|---|
-| Colab | `example/` | `example_00000.png` |
-| `video_to_frames.py` | `example_frames/` | `example_001.jpg` |
-
-The notebook writes PNG, which is lossless and several times larger; the local
-script defaults to JPEG and takes `--format png` if you want the same.
+Same folder name, same filenames, same PNG, same five digits from zero. Frames
+from either route are interchangeable, and a glob written for one works on the
+other.
 
 ### Which one to use
 

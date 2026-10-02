@@ -1,22 +1,25 @@
 #!/usr/bin/env python3
 """Split a video into numbered frames.
 
-    examples/video_to_frames.py clip.mp4
+    example/video_to_frames.py clip.mp4
 
         clip.mp4
-        clip_frames/
-            clip_001.jpg
-            clip_002.jpg
+        clip/
+            clip_00000.png
+            clip_00001.png
             ...
 
-The folder is named after the video and sits beside it; the frames carry the
-video's name too, so they stay identifiable once they are copied somewhere else
-or mixed with another clip's.
+Folder named after the video, beside it; frames carry the video's name too, so
+they stay identifiable once copied somewhere else or mixed with another clip's.
+
+The layout matches the Colab notebook deliberately - same folder name, same
+filenames, same PNG, same five digits counting from zero - so frames from
+either route are interchangeable and a glob written for one works on the other.
 
 Several at once, and every Nth frame:
 
-    examples/video_to_frames.py *.mjpeg --every 5
-    examples/video_to_frames.py clip.mp4 --format png --outdir ~/datasets
+    example/video_to_frames.py *.mjpeg --every 5
+    example/video_to_frames.py clip.mp4 --format jpg --outdir ~/datasets
 
 Uses ffmpeg, which is already on the system - no venv, no pip install, and it
 reads the .mjpeg and .gif that OpenMV IDE records as happily as .mp4.
@@ -66,11 +69,12 @@ def extract(video: Path, outdir: Path | None, every: int,
         return 0
 
     stem = video.stem
-    dest = (outdir or video.parent) / ("%s_frames" % stem)
+    # Folder named after the video, no suffix - matching the Colab notebook.
+    dest = (outdir or video.parent) / stem
 
     total = count_frames(video)
     kept = None if total is None else -(-total // every)   # ceil
-    width = digits or max(3, len(str(kept or 1)))
+    width = digits
 
     pattern = str(dest / ("%s_%%0%dd.%s" % (stem, width, fmt)))
     print("%s -> %s/%s_%s.%s  (%s frame%s%s)"
@@ -88,6 +92,8 @@ def extract(video: Path, outdir: Path | None, every: int,
         # select keeps 1 in every N; vsync 0 stops ffmpeg duplicating frames to
         # hold the original timebase, which would undo the thinning.
         cmd += ["-vf", "select=not(mod(n\\,%d))" % every, "-vsync", "0"]
+    # ffmpeg's image2 muxer counts from 1; the notebook counts from 0.
+    cmd += ["-start_number", "0"]
     if fmt in ("jpg", "jpeg"):
         cmd += ["-q:v", str(quality)]      # 2 = near-lossless, 31 = worst
     cmd += [pattern]
@@ -119,14 +125,15 @@ def main() -> None:
     ap.add_argument("video", nargs="+", help="video file(s)")
     ap.add_argument("--every", type=int, default=1, metavar="N",
                     help="keep 1 frame in every N (default 1 = all)")
-    ap.add_argument("--format", default="jpg", choices=("jpg", "png"),
-                    help="png is lossless and ~10x bigger (default jpg)")
+    ap.add_argument("--format", default="png", choices=("jpg", "png"),
+                    help="png matches the notebook and is lossless; "
+                         "jpg is ~10x smaller (default png)")
     ap.add_argument("--quality", type=int, default=2, metavar="Q",
                     help="jpg quality, 2 = best, 31 = worst (default 2)")
-    ap.add_argument("--digits", type=int, default=None, metavar="N",
-                    help="zero-padding width (default: sized to the frame count)")
+    ap.add_argument("--digits", type=int, default=5, metavar="N",
+                    help="zero-padding width (default 5, as the notebook)")
     ap.add_argument("--outdir", type=Path, default=None,
-                    help="where the _frames folders go (default: beside each video)")
+                    help="where the frame folders go (default: beside each video)")
     ap.add_argument("--dry-run", action="store_true", help="show, do not write")
     a = ap.parse_args()
 
