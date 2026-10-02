@@ -1,0 +1,12 @@
+# Environments and caches
+.venv/
+__pycache__/
+*.pyc
+.ruff_cache/
+
+# Recordings and captures
+*.mjpeg
+*.mp4
+*.gif
+captures/
+out/
