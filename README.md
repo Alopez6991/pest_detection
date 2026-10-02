@@ -52,32 +52,100 @@ and one backed by 40 are not the same claim.
 
 ## example/video_to_frames.py
 
-Splits a recording into numbered frames:
+Splits a video into numbered frames. There is a worked example in `example/`
+you can run as-is.
+
+### 1. Check you have ffmpeg
 
 ```bash
-example/video_to_frames.py clip.mp4
+ffmpeg -version
 ```
 
-```
-clip.mp4
-clip_frames/
-    clip_001.jpg
-    clip_002.jpg
-    ...
-```
-
-The folder is named after the video and sits beside it, and the frames carry
-the video's name too — so they stay identifiable once they are copied elsewhere
-or mixed with another clip's.
+Nothing to install if that prints a version. If it does not:
 
 ```bash
-example/video_to_frames.py *.mjpeg --every 5          # thin a long recording
-example/video_to_frames.py clip.mp4 --format png      # lossless, ~10x bigger
-example/video_to_frames.py clip.mp4 --outdir ~/data   # put the folders elsewhere
-example/video_to_frames.py clip.mp4 --dry-run         # show, do not write
+sudo apt install ffmpeg          # Debian / Ubuntu
+brew install ffmpeg              # macOS
 ```
 
-Uses **ffmpeg**, so no venv and no pip install, and it reads the `.mjpeg` and
-`.gif` that OpenMV IDE records as happily as `.mp4`. Zero-padding is sized to
-the frame count by default (`--digits` to override), so the names sort
-correctly without guessing a width up front.
+There is no venv and no `pip install` — the script shells out to ffmpeg, which
+also means it reads the `.mjpeg` and `.gif` that OpenMV IDE records as happily
+as `.mp4`.
+
+### 2. Run the worked example
+
+From the **root of the repo**:
+
+```bash
+python3 example/video_to_frames.py example/example.mp4
+```
+
+```
+example.mp4 -> example_frames/example_000.jpg  (277 frames)
+  277 frames, 2.2 MB
+```
+
+### 3. What you get
+
+The frames land in a folder **next to the video**, named after it:
+
+```
+example/
+├── example.mp4
+├── example_frames/          <- created for you
+│   ├── example_001.jpg
+│   ├── example_002.jpg
+│   ├── ...
+│   └── example_277.jpg
+└── video_to_frames.py
+```
+
+Both the folder and the frames carry the video's name, so they stay
+identifiable once they are copied somewhere else or mixed with another clip's.
+Zero-padding is sized to the frame count, so the names sort correctly in a file
+browser and in a shell glob.
+
+`example_frames/` is **gitignored**. It is generated, exactly reproducible from
+the video beside it, and two and a half times the size of it — so it is not committed,
+and you regenerate it by running the command above.
+
+### 4. Run it on your own video
+
+Put the video anywhere and point the script at it. The `_frames` folder is
+created beside the video, not beside the script, so nothing lands in the repo
+unless the video is in the repo:
+
+```bash
+python3 example/video_to_frames.py ~/recordings/hive_01.mjpeg
+#   -> ~/recordings/hive_01_frames/hive_01_001.jpg ...
+```
+
+To collect several videos' frames in one place instead, use `--outdir`:
+
+```bash
+python3 example/video_to_frames.py ~/recordings/*.mjpeg --outdir ~/datasets/raw
+#   -> ~/datasets/raw/hive_01_frames/...
+#      ~/datasets/raw/hive_02_frames/...
+```
+
+### 5. Options
+
+| | |
+|---|---|
+| `--every N` | keep 1 frame in every N. A 60 s clip at 16 fps is ~960 frames; `--every 8` makes that 120 |
+| `--format png` | lossless, roughly 10x bigger. Use for anything that will be re-encoded |
+| `--quality Q` | jpg quality, 2 = best (default), 31 = worst |
+| `--digits N` | fix the zero-padding width instead of sizing it to the frame count |
+| `--outdir DIR` | put the `_frames` folders somewhere else |
+| `--dry-run` | print what it would write, touch nothing |
+
+```bash
+python3 example/video_to_frames.py example/example.mp4 --every 10 --dry-run
+```
+
+```
+example.mp4 -> example_frames/example_00.jpg  (28 frames, every 10)
+```
+
+Start with `--dry-run` on a long recording: it tells you the frame count and
+the filenames before anything is written.
