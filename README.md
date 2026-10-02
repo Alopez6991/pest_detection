@@ -49,3 +49,35 @@ over the raw grid stays latched there long after it has gone (1.06 m reported
 against a wall at 3.05 m). The median here uses only zones that are updating.
 Watch `fresh`: it collapses as returns weaken, so a reading backed by 9 zones
 and one backed by 40 are not the same claim.
+
+## examples/video_to_frames.py
+
+Splits a recording into numbered frames:
+
+```bash
+examples/video_to_frames.py clip.mp4
+```
+
+```
+clip.mp4
+clip_frames/
+    clip_001.jpg
+    clip_002.jpg
+    ...
+```
+
+The folder is named after the video and sits beside it, and the frames carry
+the video's name too — so they stay identifiable once they are copied elsewhere
+or mixed with another clip's.
+
+```bash
+examples/video_to_frames.py *.mjpeg --every 5          # thin a long recording
+examples/video_to_frames.py clip.mp4 --format png      # lossless, ~10x bigger
+examples/video_to_frames.py clip.mp4 --outdir ~/data   # put the folders elsewhere
+examples/video_to_frames.py clip.mp4 --dry-run         # show, do not write
+```
+
+Uses **ffmpeg**, so no venv and no pip install, and it reads the `.mjpeg` and
+`.gif` that OpenMV IDE records as happily as `.mp4`. Zero-padding is sized to
+the frame count by default (`--digits` to override), so the names sort
+correctly without guessing a width up front.

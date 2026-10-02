@@ -26,8 +26,8 @@ CAMERA = True             # live video. Off = headless: console only, no frames
 TOF = True                # 8x8 depth sensor
 IMU = True                # accelerometer + gyro
 
-SHOW_DEPTH_MAP = True     # draw the 8x8 grid on the frame   (needs CAMERA+TOF)
-SHOW_DEPTH_TEXT = True    # the median distance, the ONLY text on the frame
+SHOW_DEPTH_MAP = False     # draw the 8x8 grid on the frame   (needs CAMERA+TOF)
+SHOW_DEPTH_TEXT = False    # the median distance, the ONLY text on the frame
 
 # ==========================================================================
 # SETTINGS
