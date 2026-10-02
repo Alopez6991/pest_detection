@@ -152,10 +152,7 @@ the filenames before anything is written.
 
 ## Running it in the browser instead
 
-There is a Colab version — **[video extractor code](https://colab.research.google.com/drive/10X0riZ2-m8GeExDOb1mULzG68ReJNGag?usp=sharing)** — if you would rather not install anything, or you are on a machine where you cannot.
-
-It does the same job as `example/video_to_frames.py`, in a notebook. Nothing to
-install, and nothing runs on your own machine.
+There is a Colab version — **[video extractor code](https://colab.research.google.com/drive/10X0riZ2-m8GeExDOb1mULzG68ReJNGag?usp=sharing)** — if you would rather not install anything, or you are on a machine where you cannot. Nothing runs on your own computer.
 
 ### Make your own copy first
 
@@ -170,20 +167,44 @@ The link is read-only. Editing or running it needs a copy in your own Drive:
 Work in the copy. Changes to it are private to you and cannot affect the
 original, so there is nothing to break.
 
-### Then
+### Run the three cells in order
 
-5. Run the cells in order — the **▶** button on each, or `Ctrl+F9` for all of
-   them. The first run asks you to confirm you want to run a notebook you did
-   not write, which is expected
-6. Give it your video. Notebooks take input one of two ways: either a **file
-   picker** that uploads from your machine, or by **mounting your Drive**
-   (`drive.mount`) and pointing at a path like
-   `/content/drive/MyDrive/videos/clip.mp4`. Mounting asks for permission the
-   first time
-7. Collect the frames. Anything written to `/content` is **deleted when the
-   session ends**, so either download them before you close the tab — the
-   folder icon in the left sidebar, then the ⋮ menu on the folder — or have
-   the notebook write straight to your mounted Drive, which persists
+Use the **▶** button on each, or `Ctrl+F9` to run them all. The first run warns
+that the notebook was not written by you, which is expected.
+
+1. **Install OpenCV** — `pip install opencv-python`. Takes a few seconds, or
+   says it is already satisfied
+2. **Upload your video** — a **Choose Files** button appears. Pick the video
+   from your own machine and wait for `100% done`; a large file over a slow
+   connection is the slowest part of the whole process
+3. **Extract frames** — reads the video, makes a folder named after it, and
+   writes every frame as a `.png`
+
+```
+Created directory: example/
+Successfully extracted 277 frames to the 'example' directory.
+```
+
+### Download them before you close the tab
+
+The frames are in Colab's session storage, **not on your computer**, and all of
+it is deleted when the session ends.
+
+Open the **folder icon** in the left sidebar, find the folder it just made,
+then the **⋮** menu beside it → **Download**. Colab zips it first, so a few
+hundred PNGs take a moment.
+
+### It names things differently from the local script
+
+Same frames, different filenames — worth knowing if you use both:
+
+| | folder | first frame |
+|---|---|---|
+| Colab | `example/` | `example_00000.png` |
+| `video_to_frames.py` | `example_frames/` | `example_001.jpg` |
+
+The notebook writes PNG, which is lossless and several times larger; the local
+script defaults to JPEG and takes `--format png` if you want the same.
 
 ### Which one to use
 
