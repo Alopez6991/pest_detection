@@ -149,3 +149,48 @@ example.mp4 -> example_frames/example_00.jpg  (28 frames, every 10)
 
 Start with `--dry-run` on a long recording: it tells you the frame count and
 the filenames before anything is written.
+
+## Running it in the browser instead
+
+There is a Colab version — **[video extractor code](https://colab.research.google.com/drive/10X0riZ2-m8GeExDOb1mULzG68ReJNGag?usp=sharing)** — if you would rather not install anything, or you are on a machine where you cannot.
+
+It does the same job as `example/video_to_frames.py`, in a notebook. Nothing to
+install, and nothing runs on your own machine.
+
+### Make your own copy first
+
+The link is read-only. Editing or running it needs a copy in your own Drive:
+
+1. Open the **[video extractor code](https://colab.research.google.com/drive/10X0riZ2-m8GeExDOb1mULzG68ReJNGag?usp=sharing)** link
+2. Sign in to a Google account if you are not already
+3. **File → Save a copy in Drive**
+4. A new tab opens titled *Copy of ...* — that one is yours, and it lands in
+   `My Drive/Colab Notebooks/`
+
+Work in the copy. Changes to it are private to you and cannot affect the
+original, so there is nothing to break.
+
+### Then
+
+5. Run the cells in order — the **▶** button on each, or `Ctrl+F9` for all of
+   them. The first run asks you to confirm you want to run a notebook you did
+   not write, which is expected
+6. Give it your video. Notebooks take input one of two ways: either a **file
+   picker** that uploads from your machine, or by **mounting your Drive**
+   (`drive.mount`) and pointing at a path like
+   `/content/drive/MyDrive/videos/clip.mp4`. Mounting asks for permission the
+   first time
+7. Collect the frames. Anything written to `/content` is **deleted when the
+   session ends**, so either download them before you close the tab — the
+   folder icon in the left sidebar, then the ⋮ menu on the folder — or have
+   the notebook write straight to your mounted Drive, which persists
+
+### Which one to use
+
+| | |
+|---|---|
+| **Colab** | nothing to install, works on any machine, good for a one-off or for showing someone |
+| **`video_to_frames.py`** | no upload, no session limits, handles a whole folder of videos at once, and the frames are already on the machine you will process them on |
+
+For a few clips Colab is the quicker path. For a recording session that
+produced thirty files, the local script will be less work.
